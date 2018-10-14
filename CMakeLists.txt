@@ -10,5 +10,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
 include_directories(.)
 include_directories(./include)
+include_directories(./examples)
+include_directories(./lib)
 
-add_library(logjson SHARED src/main.cpp include/json.hpp)
+add_executable(streamouttest examples/StreamOut.cpp examples/StreamOut.h)
+
