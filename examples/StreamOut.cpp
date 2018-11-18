@@ -1,13 +1,15 @@
 #include "StreamOut.h"
 
+using namespace csmith; 
+
 int main(){
-    csmith::LogJsonBase msg("hello");
+    LogJsonBase msg("hello");
 
-    csmith::LogJsonBase msg2("MSandNSsinceEpoch",csmith::TimestampStyle::milliseconds_and_nanoseconds_since_unix_epoch);
+    LogJsonBase msg2("MSandNSsinceEpoch",TimestampStyle::milliseconds_and_nanoseconds_since_unix_epoch);
 
-    csmith::LogJsonBase msg3("MSSinceMidnight", csmith::TimestampStyle::milliseconds_since_utc_midnight_with_date);
+    LogJsonBase msg3("MSSinceMidnight", TimestampStyle::milliseconds_since_utc_midnight_with_date);
 
-    csmith::LogJsonBase msg4("MSandNSSinceMidnight", csmith::TimestampStyle::milliseconds_and_nanoseconds_since_utc_midnight_with_date);
+    LogJsonBase msg4("MSandNSSinceMidnight", TimestampStyle::milliseconds_and_nanoseconds_since_utc_midnight_with_date);
 
     std::cout << msg << std::endl;
 
