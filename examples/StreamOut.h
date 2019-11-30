@@ -9,8 +9,4 @@
 
 #include <LogJson.hpp>
 
-
-
-
-
 #endif /* STREAMOUT_H */

@@ -2,16 +2,15 @@
 #define LOGJSON_HPP
 /*
  * @file LogJson.hpp
- * @author Connnor Jamse Smith
+ * @author Connor James Smith
  * @date 2018
- * @brief Forward Decalerations for library 
+ * @brief Forward decelerations for library
  * @copyright MIT License
  */
 
 #include <iostream>
 #include <json.hpp>
 #include <chrono>
-#include <ctime>
 
 /*!
  * @namespace csmith
@@ -19,7 +18,7 @@
  */
 namespace csmith{
 
-    using json = nlohmann::json; //Bless up
+    using json = nlohmann::json;
     
     template<typename T>
     decltype(auto) timeIsNowEpoch(){
@@ -29,12 +28,11 @@ namespace csmith{
 
     enum class TimestampStyle : uint8_t {
         milliseconds_since_unix_epoch,
-        milliseconds_since_utc_midnight_with_date,
         milliseconds_and_nanoseconds_since_unix_epoch,
-        milliseconds_and_nanoseconds_since_utc_midnight_with_date,
         nanoseconds_since_unix_epoch,
         seconds_since_unix_epoch,
-        seconds_since_midnight_with_date,
+        milliseconds_since_midnight,
+        nanoseconds_since_midnight,
         no_timestamp = 0xFF
     };
 
@@ -51,20 +49,6 @@ namespace csmith{
         uint64_t sec,ms,us,date;
     };
 
-    inline Ms_Us_Date_Midnight_class getMSandUSFromMidnightWithDate(){
-        using namespace std::chrono;
-        auto timeMeasurement = time_point_cast<nanoseconds>(system_clock::now()); 
-        Ms_Us_Date_Midnight_class ret{};
-        ret.us = timeMeasurement.time_since_epoch().count() % 86'400'000'000'000; //nanoseconds since midnight
-        ret.ms = ret.us / 1'000'000; //miliseconds since midnight
-        ret.sec = ret.us / 1'000'000'000;
-        ret.us %= 1'000'000; //nanoseconds since last milisecond
-        auto CTime = system_clock::to_time_t(timeMeasurement);
-        tm utc_tm = *gmtime(&CTime); //there has to be a better way to do this
-        ret.date = (utc_tm.tm_year+1900)*10'000 + (utc_tm.tm_mon+1)*100 + (utc_tm.tm_mday);
-        return ret;
-    }
-
 
     class LogJsonBase{
     public:
@@ -77,40 +61,21 @@ namespace csmith{
             {
                 switch(style){
                     case TimestampStyle::milliseconds_since_unix_epoch :{
-                        log["timestampMSE"] = timeIsNowEpoch<std::chrono::milliseconds>();
-                        break;
-                    }
-                    case TimestampStyle::milliseconds_since_utc_midnight_with_date:{
-                        auto mud = getMSandUSFromMidnightWithDate();
-                        log["timestampDate"] = mud.date;
-                        log["timestampMSSM"] = mud.ms;
+                        log["time"] = timeIsNowEpoch<std::chrono::milliseconds>();
                         break;
                     }
                     case TimestampStyle::milliseconds_and_nanoseconds_since_unix_epoch:{
                         auto time = getMSandUSFromEpoch();
-                        log["timestampMSE"] = time.first;
-                        log["timestampUSP"] = time.second;
-                        break;
-                    }
-                    case TimestampStyle::milliseconds_and_nanoseconds_since_utc_midnight_with_date:{
-                        auto mud = getMSandUSFromMidnightWithDate();
-                        log["timestampDate"] = mud.date;
-                        log["timestampMSSM"] = mud.ms;
-                        log["timestampUSSMSSM"] = mud.us; //nanoseconds since milliseconds since midnight
+                        log["time_ms"] = time.first;
+                        log["time_us"] = time.second;
                         break;
                     }
                     case TimestampStyle::nanoseconds_since_unix_epoch:{
-                        log["timestampUSE"] = timeIsNowEpoch<std::chrono::nanoseconds>();
+                        log["time"] = timeIsNowEpoch<std::chrono::nanoseconds>();
                         break;
                     }
                     case TimestampStyle::seconds_since_unix_epoch : {
-                        log["timestampSSE"] = timeIsNowEpoch<std::chrono::seconds>();
-                        break;
-                    }
-                    case TimestampStyle::seconds_since_midnight_with_date:{
-                        auto mud = getMSandUSFromMidnightWithDate();
-                        log["timestampDate"] = mud.sec;
-                        log["timestampSSM"] = mud.sec;
+                        log["time"] = timeIsNowEpoch<std::chrono::seconds>();
                         break;
                     }
                     case TimestampStyle::no_timestamp: {
